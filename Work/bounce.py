@@ -6,4 +6,4 @@ ratio = 3/5
 
 for i in range(10):
     start = start * ratio
-    print(i + 1, start)
+    print(i + 1, round(start, 4))
