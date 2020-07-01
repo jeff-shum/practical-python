@@ -1,22 +1,29 @@
 import csv
 
 def read_portfolio(filename):
-    '''Reads a portfolio file into a list of tuples'''
+    '''
+    Reads a portfolio file into a list of dictionaries with keys
+    name, shares, and price
+    '''
     portfolio = []
 
     with open(filename, 'rt') as f:
         rows = csv.reader(f)
         header = next(rows)
         for row in rows:
-            holding = {}
-            holding['name'] = row[0]
-            holding['shares'] = int(row[1])
-            holding['price'] = float(row[2])
+            holding = {
+            'name': row[0],
+            'shares': int(row[1]),
+            'price': float(row[2])
+            }
             portfolio.append(holding)
+
     return portfolio
 
 def read_prices(filename):
-    '''Reads a prices file into a dictionary'''
+    '''
+    Read a CSV file of price data into a dict mapping names to prices.
+    '''
     prices = {}
     
     with open(filename, 'rt') as f:
@@ -28,17 +35,19 @@ def read_prices(filename):
                 print('Row contains no data. Continuing to next row')
     return prices
 
-def compute(portfolio, prices):
-    '''Reads a portfolio list and prices dictionary and computes value of portfolio along with gain/loss'''
-    previous = 0.0
-    diff = 0.0
-    current = 0.0
+portfolio = read_portfolio('Data/portfolio.csv')
+prices = read_prices('Data/prices.csv')
 
-    for holding in portfolio:
-        previous += holding['shares']*holding['price']
+#Calculate total cost of the portfolio
+total_cost = 0.0
+for holding in portfolio:
+    total_cost += holding['shares']*holding['price']
+print('Total cost:', total_cost)
 
-        new_price = prices[holding['name']]
-        diff += (new_price-holding['price'])*holding['shares']
+#Compute the current value of portfolio
+total_value = 0.0
+for holding in portfolio:
+    total_value += holding['shares']*prices[holding['name']]
+print('Total value:', total_value)
+print('Gain:', total_value - total_cost)
 
-        current += previous + diff
-    return print(f'The value of the portfolio currently is ${current}. The gain/loss on the portfolio is ${diff}')
