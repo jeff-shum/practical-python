@@ -1,29 +1,13 @@
 import csv
+from fileparse import parse_csv
 
 def read_portfolio(filename):
     '''
     Reads a portfolio file into a list of 
     dictionaries with keys name, shares, and price.
     '''
-    portfolio = []
-
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        headers = next(rows)
-        for rowno, row in enumerate(rows):
-            record = dict(zip(headers, row))
-            try:
-                name = record['name']
-                shares = int(record['shares'])
-                price = float(record['price'])
-            except ValueError:
-                print(f'Row {rowno}: Bad row: {row}')
-            portfolio.append({
-            'name': name,
-            'shares': shares,
-            'price': price
-            })
-
+    with open(filename, 'rt') as file:
+        portfolio = parse_csv(file, select=['name', 'shares', 'price'], types=[str, int, float])
     return portfolio
 
 def read_prices(filename):
@@ -31,14 +15,9 @@ def read_prices(filename):
     Read a CSV file of price data into 
     a dict mapping names to prices.
     '''
-    prices = {}
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        for row in rows:
-            try:
-                prices[row[0]] = float(row[1])
-            except IndexError:
-                pass
+    with open(filename, 'rt') as file:
+        pricelist = parse_csv(file, has_headers=False, types=[str, float])
+    prices = dict(pricelist) 
     return prices
 
 
@@ -80,7 +59,16 @@ def portfolio_report(portfolio_filename, prices_filename):
     prices = read_prices(prices_filename)
     report = make_report(portfolio,prices)
     print_report(report)
+
+def main(argv):
+    if len(argv) != 3:
+        raise SystemExit(f'Usage: {sys.argv[0]} ' 'portfile pricefile')
+    portfile = argv[1]
+    pricefile = argv[2]
+    portfolio_report(portfile, pricefile)
+
+if __name__ == '__main__':
+    import sys
+    main(sys.argv)
     
-portfolio_report('Data/portfolio.csv',
-                 'Data/prices.csv')
 
