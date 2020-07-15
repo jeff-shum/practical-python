@@ -7,8 +7,8 @@ import report
 def portfolio_cost(filename):
     total_cost = 0
     portfolio = report.read_portfolio(filename)
-    for record in portfolio:
-        total_cost += record['shares']*record['price'] 
+    for stock in portfolio:
+        total_cost += stock.cost()
     return total_cost
 
 def main(argv):

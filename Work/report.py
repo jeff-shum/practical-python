@@ -1,5 +1,8 @@
 import csv
+import stock
 from fileparse import parse_csv
+
+import tableformat
 
 def read_portfolio(filename):
     '''
@@ -7,7 +10,8 @@ def read_portfolio(filename):
     dictionaries with keys name, shares, and price.
     '''
     with open(filename, 'rt') as file:
-        portfolio = parse_csv(file, select=['name', 'shares', 'price'], types=[str, int, float])
+        portdicts = parse_csv(file, select=['name', 'shares', 'price'], types=[str, int, float])
+    portfolio = [ stock.Stock(d['name'], d['shares'], d['price']) for d in portdicts ]
     return portfolio
 
 def read_prices(filename):
@@ -28,37 +32,40 @@ def make_report(portfolio, prices):
     name, shares, price and change.
     '''
     report = []
-    for holding in portfolio:
-        row = (holding['name'],
-        holding['shares'], 
-        holding['price'], 
-        prices[holding['name']] - holding['price']
+    for stock in portfolio:
+        row = (stock.name,
+        stock.shares, 
+        stock.price, 
+        prices[stock.name] - stock.price
         )
         report.append(row)
     return report
 
 
-def print_report(report):
+def print_report(reportdata, formatter):
     '''
     Takes a list-of-tuples report and prints it in
     an easy to read manner.
     '''
-    headers = ('Name', 'Shares', 'Price', 'Change')
-    print('%10s %10s %10s %10s' % headers)
-    print(('-' * 10 + ' ') * len(headers))
-    for name, shares, price, change in report:
-        print('{:>10s} {:>10d} {:>10.2f} {:>10.2f}'
-        .format(name, shares, price, change))
-    
+    formatter.headings(['Name', 'Shares', 'Price', 'Change'])
+    for name, shares, price, change in reportdata:
+        rowdata = [ name, str(shares), f'{price:0.2f}', f'{change:0.2f}' ]
+        formatter.row(rowdata)
 
 def portfolio_report(portfolio_filename, prices_filename):
     '''
     Make a stock report given portfolio and price files.
     '''
+    # Read data files
     portfolio = read_portfolio(portfolio_filename)
     prices = read_prices(prices_filename)
+    
+    # Create the report data
     report = make_report(portfolio,prices)
-    print_report(report)
+
+    # Print it out
+    formatter = tableformat.HTMLTableFormatter()
+    print_report(report, formatter)
 
 def main(argv):
     if len(argv) != 3:
