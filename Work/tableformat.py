@@ -53,3 +53,22 @@ class HTMLTableFormatter(TableFormatter):
         for d in rowdata:
             print(f'<td>{d}</td>', end='')
         print('</tr>')
+
+def create_formatter(name):
+    if name == 'txt':
+        return TextTableFormatter()
+    elif name == 'csv':
+        return CSVTableFormatter()
+    elif name == 'html':
+        return HTMLTableFormatter()
+    else:
+        raise RuntimeError(f'Unknown format: {fmt}')
+
+def print_table(objects, columns, formatter):
+    '''
+    Make a nicely formattted table from a list of objects and attribute names.
+    '''
+    formatter.headings(columns)
+    for obj in objects:
+        rowdata = [str(getattr(obj, name)) for name in columns]
+        formatter.row(rowdata)       
