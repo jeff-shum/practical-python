@@ -5,14 +5,14 @@ from portfolio import Portfolio
 
 import tableformat
 
-def read_portfolio(filename):
+def read_portfolio(filename, **opts):
     '''
     Reads a portfolio file into a list of 
     dictionaries with keys name, shares, and price.
     '''
     with open(filename, 'rt') as file:
-        portdicts = parse_csv(file, select=['name', 'shares', 'price'], types=[str, int, float])
-    portfolio = [ stock.Stock(d['name'], d['shares'], d['price']) for d in portdicts ]
+        portdicts = parse_csv(file, select=['name', 'shares', 'price'], types=[str, int, float], **opts)
+    portfolio = [ stock.Stock(**d) for d in portdicts ]
     return Portfolio(portfolio)
 
 def read_prices(filename):

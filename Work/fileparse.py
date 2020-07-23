@@ -36,8 +36,8 @@ def parse_csv(file, select=None, types=None, has_headers=True, delimiter=',', si
                 row = [ func(val) for func, val in zip(types, row) ]
             except ValueError as e:
                 if not silence_errors:
-                    print(f"Row {colno}: Couldn't convert {row}")
-                    print(f"Row {colno}: Reason {e}")
+                    print(f"Row {rowno}: Couldn't convert {row}")
+                    print(f"Row {rowno}: Reason {e}")
                 continue
 
         # Make a dictionary or a tuple
